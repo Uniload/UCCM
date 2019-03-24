@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+"""
+CLI manager for tribes vengeance UCC.exe / Beta_Dedicated_Server.exe
+"""
+
+import os
+import sys
+import shlex
+import subprocess
+
+installDir = "/home/nat/.wine/drive_c/PFx86/VUGames/"
+serverLine = "MP-Emerald?game=GameClasses.ModeCTF?mutator=%1 \
+-server \
+-console"
+
+def homeCLI():
+    """
+    Home parameter information
+    """
+    print '===============================================\n'
+    print ' * * * Unreal Commandline Client Manager (2.0.0) * * * \n'
+    print '\tUCCM \033[91mserver\033[0m'
+    print '\tUCCM \033[91mcompile\033[0m'
+    print '\tUCCM \033[91mmove\033[0m'
+    print '\n==============================================='
+    exit()
+
+def move(filename):
+    os.system(
+        "cd " + installDir + "Tribes/Program/Cache; \
+        rm -rf *; \
+        \
+        cd " + installDir + "Server/Program/Bin; \
+        rm -f " + filename + ".u;\
+        \
+        cd " + installDir + "Tribes/Program/Bin; \
+        rm -f " + filename + ".u;\
+        \
+        cd " + installDir + "Tribes/Program/Bin_dev; \
+        cp " +  filename + ".u ../Bin/; \
+        \
+        cd " + installDir + "Tribes/Program/Bin_dev; \
+        mv " +  filename + ".u ../../../Server/Program/Bin/; \
+        "
+    )
+
+if len(sys.argv) < 2:
+    homeCLI()
+
+if sys.argv[1] == 'move':
+    if len(sys.argv) == 2:
+        print "Requires mutator name as parameter!"
+    if len(sys.argv) == 3:
+        move(sys.argv[2])
+
+elif sys.argv[1] == 'server':
+    if len(sys.argv) == 2:
+        os.system(
+            "cd " + installDir + "Server/Program/Bin; \
+            wine Beta_Dedicated_Server.exe \
+            MP-Emerald?gamemode=GameClasses.ModeCTF?\
+            mutator=Antics_v6.antics -console"
+        )
+    exit()
+
+elif sys.argv[1] == 'compile':
+    if len(sys.argv) >= 2:
+
+        process = subprocess.Popen(
+            shlex.split("wine ucc make -nobind"),
+            cwd=installDir + "Tribes/Program/Bin_dev/",
+            stdout=subprocess.PIPE
+        )
+        success = False
+        while True:
+            line = process.stdout.readline()
+            if line != '':
+                if line.split(' ', 1)[0] == 'Success':
+                    success = (len(sys.argv) == 3)
+                print line.rstrip()
+            else:
+                break
+
+        if success:
+            move(sys.argv[2])
+            print "Moved " + sys.argv[2]
+    exit()
