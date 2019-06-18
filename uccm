@@ -6,7 +6,6 @@ CLI manager for tribes vengeance UCC.exe / Beta_Dedicated_Server.exe
 
 import os
 import sys
-import shlex
 import subprocess
 
 installDir = "/home/nat/.wine/drive_c/PFx86/VUGames/"
@@ -68,7 +67,7 @@ elif sys.argv[1] == 'compile':
     if len(sys.argv) >= 2:
 
         process = subprocess.Popen(
-            shlex.split("wine ucc make -nobind"),
+            ["wine", "ucc", "make", "-nobind"],
             cwd=installDir + "Tribes/Program/Bin_dev/",
             stdout=subprocess.PIPE
         )
